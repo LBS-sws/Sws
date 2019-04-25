@@ -1,0 +1,2 @@
+.has-error .error{color: #a94442;}
+.main-box{display: block;max-width: 600px;margin: 0 auto;margin-top:15%; border:1px #ddd solid;border-radius: 10px;box-shadow: 5px 5px 5px rgba(211,211,211,.5);padding: 15px;}
