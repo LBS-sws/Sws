@@ -152,7 +152,7 @@ class PHPExcelService{
         header("Content-Type:application/vnd.ms-execl");
         header("Content-Type:application/octet-stream");
         header("Content-Type:application/download");;
-        header("Content-Disposition:attachment;filename='$str.xls'");
+        header("Content-Disposition:attachment;filename=$str.xls");
         header("Content-Transfer-Encoding:binary");
 
         $objWriter = new \PHPExcel_Writer_Excel5($this->objPHPExcel);//设置保存版本设置当前的sheet

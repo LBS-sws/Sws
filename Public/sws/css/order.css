@@ -59,7 +59,7 @@
 .address-div .dl-horizontal dt{width: 180px;}
 .address-ex{margin-left: -15px;margin-right: -15px;border-bottom: 1px solid #ccc;padding: 0px 50px;margin-bottom: 10px;}
 
-.load-order{position: absolute;top: 50%;left: 50%;width: 300px;height: 80px;margin-top: -40px;margin-left: -150px;background: #fff;border-radius: 10px;box-shadow: 5px 5px 5px inset rgba(0,0,0,.5);line-height: 80px;text-align: center;}
+.load-order{position: absolute;top: 20%;left: 50%;width: 300px;padding:20px 10px;min-height: 80px;margin-left: -150px;background: #fff;border-radius: 10px;box-shadow: 5px 5px 5px inset rgba(0,0,0,.5);line-height: 27px;text-align: center;}
 .load-order>.glyphicon{margin-right: 5px;}
 
 .order-label{position: relative;padding-left: 15px;padding-right: 0px;text-align: left !important;}

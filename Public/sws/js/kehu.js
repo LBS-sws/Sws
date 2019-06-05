@@ -142,6 +142,8 @@ $(function ($) {
         var dataJSON = {
             "id":$("#id").val(),
             "token":$("#token").val(),
+            "storey":$("#storey").val(),
+            "room_number":$("#room_number").val(),
             "address":address
         };
         if(address == "" || address == undefined){

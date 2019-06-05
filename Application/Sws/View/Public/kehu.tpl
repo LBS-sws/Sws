@@ -50,9 +50,9 @@
             <p class="text-center" id="address-span"><b>ddddddddddddddddddddddddddddddddddd</b></p>
             <div class="storey_div" id="storey_div">
                 <label>{%$Think.lang.storey%}：</label>
-                <div><input type="number" name="storey" id="storey" class="form-control"></div>
+                <div><input type="text" name="storey" id="storey" class="form-control"></div>
                 <label>{%$Think.lang.room_number%}：</label>
-                <div><input type="number" name="room_number" id="room_number" class="form-control"></div>
+                <div><input type="text" name="room_number" id="room_number" class="form-control"></div>
             </div>
             <div class="form-group">
                 <div class="col-xs-4 col-xs-offset-4">

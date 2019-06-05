@@ -11,6 +11,7 @@ use Think\Controller;
 
 class LoginController extends Controller {
     public function index(){
+        //var_dump(session('?user'));die();
         if(session('?user')){
             $this->redirect('/sws/index/index');
         }else{
@@ -37,6 +38,7 @@ class LoginController extends Controller {
                 if($password === $userList["password"]){
                     $user = $userView->where(array("id"=>$userList["id"]))->find();
                     session('user',$user);
+                    //var_dump(session('?user'));die();
                     $this->ajaxReturn(array("status"=>1));
                 }else{
                     $this->ajaxReturn(array("status"=>0,"error"=>"password","content"=>L("error_password")));
@@ -120,6 +122,7 @@ class LoginController extends Controller {
         $data = I("post.");
         if (IS_POST){
             if (!$orderModel->create($data,1)){
+                die();
                 $this->error($orderModel->getError(),"/sws/login/order",5);
             }else{
                 //害蟲驗證
@@ -376,7 +379,8 @@ class LoginController extends Controller {
                 $data = array("status"=>"guest_service","id"=>$id,'kehu_set'=>1,'kehu_set'=>1);
                 $his_data = array("sta_id"=>$id,"status"=>"ok_order");
                 $kehuService->saveKehu($data,$his_data,$email_title,$orderList);
-                $this->ajaxReturn(array("status"=>1,"html"=>L("save_address"),"url"=>U("/sws/login/order")));
+                $url = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["HTTP_HOST"]."/".C('DEFINE')["close_open_prefix"]."/index.php?lang=".getTopStrToLang();
+                $this->ajaxReturn(array("status"=>1,"html"=>L("address_12"),"url"=>$url));
             }else{
                 $this->ajaxReturn(array("status"=>0,"html"=>L("save_error"),"url"=>U("/sws/login/order")));
             }

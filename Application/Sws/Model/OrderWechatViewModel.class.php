@@ -11,16 +11,23 @@ namespace Sws\Model;
 
 use Think\Model;
 
-class OrderViewModel extends Model\ViewModel {
+class OrderWechatViewModel extends Model\ViewModel {
     public $viewFields = array(
+        'OrderWechat'=>array(
+            'id','openid','order_sta_id','latitude','longitude','weChat_state','weChat_remark',
+            '_type'=>'LEFT'
+        ),
+        'OrderSta'=>array(
+            'order_id','s_code','s_type','kehu_lang','remark','status','total_price','lcu','luu','lcd','lud','send_email','service_time','service_time_end','kehu_set',
+            '_on'=>'OrderWechat.order_sta_id=OrderSta.id'
+        ),
         'order'=>array(
-            'id','order_type','order_code','order_name','appellation','email','phone',
+            'order_type','order_code','order_name','appellation','email','phone',
             'house_type','city_id','area_id','address','door_in','door_out','number',
-            'question','token','lcu_ip','luu_id','from_order',
-            'lcd','lud',
+            'question','token','from_order',
             '_as'=>"t_order",
             //'_table'=>"quote_order",
-            '_type'=>'LEFT'
+            '_on'=>'t_order.id=OrderSta.order_id'
         ),
         'City'=>array(
             'region_id'=>'region_id',

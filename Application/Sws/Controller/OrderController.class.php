@@ -48,6 +48,7 @@ class OrderController extends BaseController {
         $orderList = $orderService->getOrderListToId($index);
         $historyList = $orderHisViewModel->where(array("sta_id"=>$index))->order('lcd desc')->select();
         if($orderList){
+            $orderList["from_order"] = empty($orderList["from_order"])?L("PC"):L("weChat");
             $orderList["service_time"] =empty($orderList["service_time"])?"":date("Y-m-d H:i",strtotime($orderList["service_time"]));
             $orderList["service_time_end"] =empty($orderList["service_time_end"])?"":date("Y-m-d H:i",strtotime($orderList["service_time_end"]));
             $this->assign("orderList",$orderList);

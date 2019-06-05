@@ -19,6 +19,7 @@ class OrderModel extends Model{
         array('appellation','require','稱謂必须！',1),
         array('email','require','郵箱必须！',1),
         array('phone','require','電話必须！',1),
+        array('token','require','驗證必须！',0),
         //array('house_type','require','客戶類別必须！',1),
         array('city_id','require','城市必须！',1),
         array('area_id','require','區域必须！',1),
@@ -33,6 +34,7 @@ class OrderModel extends Model{
     //自動完成
     protected $_auto = array (
         array('lcu_ip','getLcuIp',self::MODEL_INSERT,'callback'),
+        array('from_order','getFromOrder',self::MODEL_INSERT,'callback'),
         array('lcd','getNowDate',self::MODEL_INSERT,'callback'),
         //array('question','strToHtmlspecialchars',self::MODEL_BOTH,'function'),
         array('luu_id','getAdminId',self::MODEL_UPDATE,'callback'),
@@ -40,7 +42,7 @@ class OrderModel extends Model{
         array('order_type','setOrderType',self::MODEL_INSERT,'callback'),
     );
 
-    protected $insertFields = 'order_name,order_type,appellation,email,phone,city_id,area_id,door_in,lcu_ip,lcd,token'; // 新增数据的时候允许写入
+    protected $insertFields = 'order_name,order_type,appellation,email,phone,city_id,area_id,door_in,from_order,lcu_ip,lcd,token'; // 新增数据的时候允许写入
     protected $updateFields = 'id,order_name,appellation,email,phone,city_id,area_id,address,door_in,luu_id'; // 编辑数据的时候只允许写入
 
 
@@ -131,6 +133,15 @@ class OrderModel extends Model{
     public function getLcuIp($str){
         $ip = get_client_ip();
         return $ip;
+    }
+
+    public function getFromOrder($str){
+        $openid = session("access_token");//["openid"]
+        if(!empty($openid)&&in_array("openid",$openid)){
+            return 1;//微信下單
+        }else{
+            return 0;//PC下單
+        }
     }
 
     public function getNowDate($str){

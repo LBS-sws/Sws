@@ -25,6 +25,7 @@
             <p class="text-center image_top"><img src="__PUBLIC__/sws/img/{%$Think.lang.img_1_1%}" width="150px"/></p>
             <switch name="type">
                 <case value="a">
+                    <!--
                     <p class="text-center">{%$Think.lang.address_01%}</p>
                     <p class="text-center">{%$Think.lang.address_01_02%}</p>
                     <p class="text-center">{%$Think.lang.address_02%}</p>
@@ -32,6 +33,7 @@
                         <span>{%$Think.lang.address_03%}: (852) 2302 0991&nbsp;&nbsp;&nbsp;&nbsp;{%$Think.lang.address_04%}: 400 864 9998</span><br/>
                         <span>{%$Think.lang.address_05%}: (853) 2871 9588&nbsp;&nbsp;&nbsp;&nbsp;{%$Think.lang.address_06%}: 0800 002 678</span>
                     </p>
+                    -->
                     <include file="Public:kehu" />
                     <js href="__PUBLIC__/sws/js/kehu.js?{%$Think.config.DEFINE.webVersions%}"/>
                 </case>
