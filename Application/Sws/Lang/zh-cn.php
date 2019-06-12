@@ -324,7 +324,7 @@ return array(
     'address_01_03'=>'以您目前的位置来寻找',
     'address_01_04'=>'选择所在位置',
     'address_01_05'=>'或',
-    'address_01_06'=>'请输入地址',
+    'address_01_06'=>'请输入服务地址（如找不到请<a id="none_address" href="#">按此</a>再输入）',
     'address_01_07'=>'搜索',
     'address_01_08'=>'地区索引',
     'address_01_09'=>'请选择地址',

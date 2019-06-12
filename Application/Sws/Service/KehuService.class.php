@@ -31,7 +31,14 @@ class KehuService{
             if(!empty($rows)){
                 $key = ($page-1)*20;
                 foreach ($rows as $row){
-                    $key++;
+                    $html.='<li>';
+                    if(is_array($row->address)){
+                        $html.='<span>'.$row->name.'</span>';
+                    }else{
+                        $html.='<span>'.$row->name.'（'.$row->address.'）</span>';
+                    }
+                    $html.='</li>';
+/*                    $key++;
                     $html.='<li><div class="media"><div class="media-left media-middle">';
                     $html.='<span class="badge">'.$key.'</span></div><div class="media-body media-middle">';
                     if(is_array($row->address)){
@@ -41,7 +48,7 @@ class KehuService{
                     }
                     $html.='</div><div class="media-right media-middle">';
                     $html.='<button type="button" class="btn btn-kehu pull-right okSelect">'.L("address_01_10").'</button>';
-                    $html.='</div></div></li>';
+                    $html.='</div></div></li>';*/
                 }
             }
         }

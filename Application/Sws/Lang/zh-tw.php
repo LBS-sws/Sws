@@ -322,7 +322,7 @@ return array(
     'address_01_03'=>'以您目前的位置來尋找',
     'address_01_04'=>'選擇所在位置',
     'address_01_05'=>'或',
-    'address_01_06'=>'請輸入地址',
+    'address_01_06'=>'請輸入地址（如找不到<a id="none_address" href="#">按此</a>再輸入）',
     'address_01_07'=>'搜索',
     'address_01_08'=>'地區索引',
     'address_01_09'=>'請選擇地址',

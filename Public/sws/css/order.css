@@ -122,23 +122,20 @@ body{
         width: 37.5%;
     }
 }
-
-
 .kehu-div{
-    background: #363434;
-    color: #fff;
+    color: #3e403e;
     padding-top: 15px;
     padding-bottom: 15px;
 }
-.btn-kehu{
+/*.btn-kehu{
     background: #ed1c24;
-    color: white;
+    color: #3e403e;
     border: 0;
 }
 .btn-kehu:hover,.btn-kehu:active{
     background: white;
     color: #3e403e;
-}
+}*/
 .kehu-div-or{
     position: relative;
 }
@@ -162,4 +159,12 @@ body{
 .kehu-div-ul{max-height: 500px;overflow-y: auto;}
 .kehu-div-ul>li{padding: 5px 0px;border-bottom: 1px solid #ddd;}
 .kehu-div-ul>li:last-child{padding-bottom: 5px;border-bottom:none;}
-.btn-kehu>.glyphicon{margin-right: 5px;vertical-align: -1px}
+/*
+.btn-kehu>.glyphicon{margin-right: 5px;vertical-align: -1px}*/
+
+.down_address{position: relative;overflow: visible;}
+#down_show{position: absolute;left: 15px;right: 15px;top: 100%;display: block;max-height: 250px;overflow-x: hidden;overflow-y: scroll;
+    z-index: 999;background: #fff;border:1px solid #ccc;box-shadow:1px 2px 4px rgba(46, 55, 62, 0.2);display: none;
+}
+#down_show>ul{display: block;list-style: none;width: 100%;margin: 0px;padding: 0px;}
+#down_show>ul>li{float: left;width: 100%;;margin: 0px;padding:6px 5px;}

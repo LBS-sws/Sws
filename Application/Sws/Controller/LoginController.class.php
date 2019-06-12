@@ -122,7 +122,6 @@ class LoginController extends Controller {
         $data = I("post.");
         if (IS_POST){
             if (!$orderModel->create($data,1)){
-                die();
                 $this->error($orderModel->getError(),"/sws/login/order",5);
             }else{
                 //害蟲驗證
@@ -207,6 +206,7 @@ class LoginController extends Controller {
         $type = I('type',0);//客戶的選擇
         $sta_id = I('index',0);//訂單id（order_id)
         $token = I('token',0);
+        $webPrefix= getWebPrefix();
         if(empty($type)||empty($sta_id)||empty($token)){
             $this->redirect("/sws/login/order");
             return false;
@@ -249,10 +249,11 @@ class LoginController extends Controller {
             if($rs){
                 if($rs["kehu_set"] == 0){ //允許客戶修改訂單
                     if(!empty($type)){
-                        if($type != "a"){
+                        if($type != "a" || $webPrefix =="cn"){
                             $data['kehu_set'] = 1;
                             $kehuService = new  KehuService();
                             $kehuService->saveKehu($data,$his_data,$email_title,$rs,$type);
+                            $type = $type=="a"?"d":$type;//域名cn不需要輸入地址
                         }
                     }
                 }else{

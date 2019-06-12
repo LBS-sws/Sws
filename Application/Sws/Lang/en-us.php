@@ -323,7 +323,7 @@ return array(
     'address_01_03'=>'Your current location',
     'address_01_04'=>'Choose your location',
     'address_01_05'=>'or',
-    'address_01_06'=>'Please enter the address',
+    'address_01_06'=>'Please enter the service address (if you cannot find it, please click <a id="none_address" href="#">here again</a>)',
     'address_01_07'=>'search',
     'address_01_08'=>'Regional index',
     'address_01_09'=>'Please select the address',
