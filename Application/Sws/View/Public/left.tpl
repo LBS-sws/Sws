@@ -41,7 +41,7 @@
         </foreach>
         <li>
             <a href="{%:U('/sws/login/loginOut')%}">
-                <i class="glyphicon glyphicon-off fa-fw media-middle"></i>
+                <i class="fa fa-power-off fa-fw media-middle"></i>
                 <span class="media-middle">{%$Think.lang.loginOut%}</span>
             </a>
         </li>

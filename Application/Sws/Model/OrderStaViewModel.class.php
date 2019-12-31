@@ -17,11 +17,12 @@ class OrderStaViewModel extends Model\ViewModel {
             'id','order_id','s_code','s_type','kehu_lang','remark','status','total_price','lcu','luu','lcd','lud','send_email','service_time','service_time_end','kehu_set',
             '_type'=>'LEFT'
         ),
-        't_order'=>array(
+        'order'=>array(
             'order_type','order_code','order_name','appellation','email','phone',
             'house_type','city_id','area_id','address','door_in','door_out','number',
-            'question','token',
-            '_table'=>"quote_order",
+            'question','token','from_order',
+            //'_table'=>"quote_order",
+            '_as'=>"t_order",
             '_on'=>'t_order.id=OrderSta.order_id'
         ),
         'City'=>array(

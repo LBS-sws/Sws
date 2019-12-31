@@ -13,12 +13,13 @@ use Think\Model;
 
 class OrderViewModel extends Model\ViewModel {
     public $viewFields = array(
-        't_order'=>array(
+        'order'=>array(
             'id','order_type','order_code','order_name','appellation','email','phone',
             'house_type','city_id','area_id','address','door_in','door_out','number',
-            'question','token','lcu_ip','luu_id',
+            'question','token','lcu_ip','luu_id','from_order',
             'lcd','lud',
-            '_table'=>"quote_order",
+            '_as'=>"t_order",
+            //'_table'=>"quote_order",
             '_type'=>'LEFT'
         ),
         'City'=>array(

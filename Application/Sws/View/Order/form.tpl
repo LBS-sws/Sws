@@ -182,6 +182,22 @@
             $("#start_date").datetimepicker('setEndDate', endtime);
         });
         $("#firstForm").validate();
+
+        $("#businessDiv").delegate(".onlyBusiness","click",function () {
+            if($(this).data("type")==1){
+                $.ajax({
+                    type: "post",
+                    url: "{%:U('/sws/order/ajaxTotalPrice')%}",
+                    data: $("#firstForm").serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        if(data.status == 1){
+                            $("input[name='total_price']").val(data.price);
+                        }
+                    }
+                });
+            }
+        })
     })
 </script>
 <js href="__PUBLIC__/sws/js/jquery.validate.min.js"/>

@@ -327,8 +327,7 @@ class OrderService{
             //$regionList = $regionModel->order('z_index asc')->getField('id,region_name'.$prefix);
             $cityList = $cityModel->where(array('region_id'=>$orderList["region_id"]))->getField("id,city_name".$prefix);
             $areaList = $areaModel->where(array('city_id'=>$orderList["city_id"]))->getField("id,area_name".$prefix);
-            $areaList[0]=L("city_other");
-            //$url = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["HTTP_HOST"]."/".getTopStrToLang()."/".C('DEFINE')["close_open_prefix"];
+            $areaList[0]=L("city_other");//pestcontrol/index.php?lang=en
             $url = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["HTTP_HOST"]."/".C('DEFINE')["close_open_prefix"]."/index.php?lang=".getTopStrToLang();
             $closeUrl = $url;
             $email_import = getEmailImportToEmail($orderList["email"]);
@@ -353,9 +352,13 @@ class OrderService{
         $prefix = getNamePrefix();
         $orderStaViewModel = D("OrderStaView");
         $orderBusViewModel = D("OrderBusView");
+        $nowDate = date("Y-m-d");
+        $first_day = date('Y-m-d 00:00:00', strtotime("$nowDate -1 month"));
         $map["city_id"]= array('in',$user["city_auth"]);
+        $map["lcd"]= array('EGT',$first_day);
         $orderList = $orderStaViewModel->where($map)->order('id desc')->select();
         foreach ($orderList as &$order){
+            $order["from_order"] = empty($order["from_order"])?L("PC"):L("weChat");
             $order["appellation_ns"] = L($define["appellation_list"][$order["appellation"]]);
             $businessList = $orderBusViewModel->where(array("order_id"=>$order["order_id"],"type"=>$order["s_type"]))->getField('name'.$prefix,true);
             $order["business_name"] = implode("、",$businessList);
@@ -387,8 +390,6 @@ class OrderService{
             $orderList["style"] = getStyleToStatus($orderList["status"]);
             if($orderList["s_type"]==0 && $orderList["status"]=="send"){
                 $orderList["status"] = "order_status_sales";
-            }elseif ($orderList["s_type"]==1 && $orderList["status"]=="send"){
-                $orderList["status"] = "send_new";
             }
             $businessList = $orderBusViewModel->where(array("order_id"=>$orderId,"type"=>$orderList["s_type"]))->select();
             $orderList["business_list"] = $businessList;
@@ -438,13 +439,15 @@ class OrderService{
         $orderList["business_list"] = array();
         foreach ($data["business_id"] as $business_id){
             $business = $businessModel->where(array("id"=>$business_id))->find();
-            $orderList["business_list"][] = $business;
-            $orderBusModel->create(array(
-                "order_id"=>$rs["order_id"],
-                "bus_type"=>$business["type"],
-                "bus_id"=>$business_id
-            ));
-            $orderBusModel->add();//害蟲添加
+            if($business){
+                $orderList["business_list"][] = $business;
+                $orderBusModel->create(array(
+                    "order_id"=>$rs["order_id"],
+                    "bus_type"=>$business["type"],
+                    "bus_id"=>$business_id
+                ));
+                $orderBusModel->add();//害蟲添加
+            }
         }
         $data["service_time"] = empty($data["service_time"])?null:$data["service_time"];
         $data["service_time_end"] = empty($data["service_time_end"])?null:$data["service_time_end"];
@@ -467,6 +470,32 @@ class OrderService{
         $this->order_id = $data["id"];
         $this->sta_id = $rs["id"];
         $this->order_list = $orderList;
+        $this->sendTemplate($rs["id"],"您的订单已修改，请及时核对信息！");
+    }
+
+    protected function sendTemplate($sta_id,$change_title){
+        if(!empty($sta_id)){
+            $orderList = $this->order_list;
+            $orderWechatModel = D("OrderWechat");
+            $openid = $orderWechatModel->where(array("order_sta_id"=>$sta_id))->getField("openid");
+            if($openid){//如果綁定了微信，發送微信模板信息
+                $arrName = array();
+                foreach ($orderList["business_list"] as $list){
+                    $arrName[] = $list["name"];
+                }
+                $weChatService = new WeChatService();
+                $data = array(
+                    "change_title"=>$change_title,
+                    "sta_id"=>$sta_id,
+                    "order_name"=>$orderList["order_name"],
+                    "s_code"=>$orderList["order_code"],
+                    "name"=>$arrName,//害蟲名字
+                    "lcd"=>$orderList["lcd"],
+                );
+                $weChatService->sendTemplateToOrderChange($data,$openid);
+            }
+        }
+
     }
 
     //訂單處理(訂單接受、拒絕)、發郵箱給客戶
@@ -516,6 +545,7 @@ class OrderService{
                     $data["total_price"]=$total_price;
                     $email_title = L("email_42");
                     $his_data = array("sta_id"=>$sta_id,"status"=>"ok_order");
+                    $template_title = "您的订单已受理！";
                     break;
                 case "finish":
                     $total_price = I("total_price","");//總價
@@ -534,6 +564,7 @@ class OrderService{
                     $email_title = L("email_42");
                     $his_data = array("sta_id"=>$sta_id,"status"=>"finish");
                     $end_html = "";
+                    $template_title = "您的订单已完成！";
                     break;
                 case "reject":
                     $remark = I("remark");//拒絕原因
@@ -541,6 +572,7 @@ class OrderService{
                     $data["remark"]=$remark;
                     $his_data = array("sta_id"=>$sta_id,"status"=>"no_order");
                     $end_html='<p>'.L("reject_remark").':'.$remark.'</p>';
+                    $template_title = "您的订单被拒绝！";
                     break;
                 default:
                     return false;
@@ -572,6 +604,7 @@ class OrderService{
                 if(is_file($file))
                     L(include $file);
             }
+            $this->sendTemplate($sta_id,$template_title);
             return true;
         }else{
             return false;
@@ -742,4 +775,5 @@ class OrderService{
         }
         return $this->html;
     }
+
 }

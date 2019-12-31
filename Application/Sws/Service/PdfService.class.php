@@ -99,7 +99,7 @@ class PdfService{
 
         //繪製錶格
         $this->_PDF->SetLineStyle(array('width' => 0.2, 'cap' => 'square', 'join' => 'miter', 'dash' => '0', 'color' => array(0, 0,0)));
-        //$order["address"]="11111";
+        //$order["address"]="到家了發看到經理髮家史砥礪奮進卡薩丁發達阿斯頓發送到發送到發打手動閥手動閥手動閥打發的撒";
         $changeHeight = 0;
         if(!empty($order["address"])){
             $changeHeight = -10;
@@ -184,9 +184,12 @@ class PdfService{
 
         if(!empty($order["address"])){
             //客戶地址
-            $html = "<p><b>".L("address")."：</b>".$order["address"]."</p>";
+            $html = "<p><b>".L("address")."：</b></p>";
             $this->_PDF->SetFont('stsongstdlight', '', 12, '', true);
-            $this->_PDF->writeHTMLCell(170, 5, 15,123, $html, 0, 1, 0, true, '', true);
+            $this->_PDF->writeHTMLCell(24, 5, 15,123, $html, 0, 1, 0, true, '', true);
+            $html = "<p style='font-weight: bold'>".$order["address"]."</p>";
+            $this->_PDF->SetFont('stsongstdlight', '', 12, '', true);
+            $this->_PDF->writeHTMLCell(162, 5, 37,123, $html, 0, 1, 0, true, '', true);
             //服務時間
             $html = "<p><b>".L("service_time")."：</b>".$order["service_time"].L("to").$order["service_time_end"]."</p>";
             $this->_PDF->SetFont('stsongstdlight', '', 12, '', true);

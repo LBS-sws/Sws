@@ -48,6 +48,7 @@ class OrderController extends BaseController {
         $orderList = $orderService->getOrderListToId($index);
         $historyList = $orderHisViewModel->where(array("sta_id"=>$index))->order('lcd desc')->select();
         if($orderList){
+            $orderList["from_order"] = empty($orderList["from_order"])?L("PC"):L("weChat");
             $orderList["service_time"] =empty($orderList["service_time"])?"":date("Y-m-d H:i",strtotime($orderList["service_time"]));
             $orderList["service_time_end"] =empty($orderList["service_time_end"])?"":date("Y-m-d H:i",strtotime($orderList["service_time_end"]));
             $this->assign("orderList",$orderList);
@@ -169,6 +170,27 @@ class OrderController extends BaseController {
             $this->redirect("/sws/order/detail",array("index"=>$id));
         }else{
             $this->error(L("operation_error"),"/sws/order/index",5);
+        }
+    }
+
+    //退回订单
+	public function ajaxTotalPrice(){
+        if (IS_AJAX) {
+            $data = I("post.");
+            $orderStaViewModel = D("OrderStaView");
+            $businessModel = D("Business");
+            $orderList = $orderStaViewModel->where(array("id"=>$data["id"]))->find();
+            if($orderList){
+                $orderList["total_price"]=0;
+                $businessList = $businessModel->where(array("id"=>array('in',$data['business_id'])))->select();
+                $orderList["business_list"] = $businessList;
+                setOrderTotalPrice($orderList);//計算總價
+                $this->ajaxReturn(array("status"=>1,"price"=>$orderList["total_price"]));
+            }else{
+                $this->ajaxReturn(array("status"=>0,"price"=>""));
+            }
+        }else{
+            $this->redirect("sws/api/orderList",array(),6,"666666666");
         }
     }
 }

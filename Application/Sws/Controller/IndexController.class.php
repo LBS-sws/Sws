@@ -34,29 +34,41 @@ class IndexController extends BaseController {
         if(IS_AJAX){
             $user = session("user");
             $orderStaViewModel = D("OrderStaView");
-            $city = I("city_id");
+            $city = I("city_id",0);
             $arrMonth=array(L("January"), L("February"), L("March"), L("April"), L("May"), L("June"), L("July"), L("August"), L("September"), L("October"), L("November"), L("December"));
-            $arrCount=array();
+            $arrPC=array();
+            $arrWeChat=array();
+            $cityList = explode(",",$user["city_auth"]);
 
             foreach ($arrMonth as $key=>$value){
                 $month = date("m");
                 $starTime = date("Y")."-".($key+1)."-1 00:00:00";
                 $endTime  = date("Y")."-".($key+1)."-31 23:59:59";
+                //$sql = "select sum(case when from_order=0 then 1 else 0 end ) AS pc_sum,sum(case when from_order=1 then 1 else 0 end ) AS weChat_sum from __USER__ where lcd >='$starTime' AND lcd <='$endTime' ";
                 $map["lcd"]=array(array('EGT',$starTime),array('ELT',$endTime));
-                if(empty($city)){
-                    $map["city_id"]= array('in',$user["city_auth"]);
+                if (is_numeric($city)&&$city!=0&&in_array($city,$cityList)){
+                    $map["city_id"] = $city;
+                    //$sql.=" and city_id='$city'";
                 }else{
-                    $map["city_id"]=$city;
+                    //$user["city_auth"] = rtrim($user["city_auth"],",");
+                    //$sql.=" and city_id in (".$user["city_auth"].")";
+                    $map["city_id"]= array('in',$user["city_auth"]);
                 }
                 if($month < $key+1){
-                    $count = 0;
+                    $count = array(
+                        "weChat_sum"=>0,
+                        "pc_sum"=>0,
+                    );
                 }else{
-                    $count = $orderStaViewModel->where($map)->count();
+                    $count = $orderStaViewModel->field('sum(case when from_order=0 then 1 else 0 end ) AS pc_sum,sum(case when from_order=1 then 1 else 0 end ) AS weChat_sum')->where($map)->find();
                 }
-                array_push($arrCount,$count);
+                $count["pc_sum"]=empty($count["pc_sum"])?0:$count["pc_sum"];
+                $count["weChat_sum"]=empty($count["weChat_sum"])?0:$count["weChat_sum"];
+                array_push($arrPC,$count["pc_sum"]);
+                array_push($arrWeChat,$count["weChat_sum"]);
             }
 
-            $this->success(array("arrCount"=>$arrCount,"arrMonth"=>$arrMonth));
+            $this->success(array("arrMonth"=>$arrMonth,"arrPC"=>$arrPC,"arrWeChat"=>$arrWeChat));
         }else{
             $this->redirect("/sws/index/index");
         }
@@ -113,6 +125,36 @@ class IndexController extends BaseController {
             $phpExcelService->outPrint();
         }else{
             $this->redirect("/sws/index/index");
+        }
+    }
+
+    //修改無效數據
+    public function test(){
+        $orderStaModel = D("OrderSta");//訂單狀態、價格表
+        $orderHisModel = D("OrderHis");//訂單記錄表
+        $rows = $orderStaModel->where(array("status"=>"service"))->select();
+        foreach ($rows as $row){
+            $orderHisModel->where(array("sta_id"=>$row["id"],"status"=>"ok_order","lud"=>array("EGT",$row["lud"])))
+                ->save(array("status"=>"finish"));
+        }
+        $orderStaModel->where(array("status"=>"service"))->save(array("status"=>"finish"));
+    }
+
+    //修改自動過期訂單的bug數據
+    public function test2(){
+        $orderStaModel = D("OrderSta");//訂單狀態、價格表
+        $orderHisModel = D("OrderHis");//訂單記錄表
+        $rows = $orderHisModel->field('sta_id,count(status) as s_sum')->where(array("status"=>"auto_rejected"))->group('sta_id')->select();
+        if($rows){
+            foreach ($rows as $row){
+                if($row["s_sum"]>1){
+                    $orderHisModel->where(array("status"=>array("in",array("overdue_email","auto_rejected")),"sta_id"=>$row["sta_id"]))->delete();
+                    $hisRow = $orderHisModel->where(array("sta_id"=>$row["sta_id"]))->order('lcd desc')->find();
+                    if($hisRow["status"]=="ok_order"){
+                        $orderStaModel->where(array("status"=>"auto_rejected","id"=>$row["sta_id"]))->save(array("status"=>"finish"));
+                    }
+                }
+            }
         }
     }
 }

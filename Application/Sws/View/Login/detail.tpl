@@ -276,15 +276,15 @@ var _hmt = _hmt || [];
                         <div class="col-lg-10 text-left col-lg-offset-1 form-control-static font-bold-16 order_detail_bottom">
                             <switch name="orderList.order_type">
                                 <case value="1">
-                                    {%$Think.lang.order_now_1_1_1%}
-                                    <a class="email_import" target="_blank" href="{%$email_import|default='#'%}">{%$Think.lang.order_now_1_1_2%}</a>
-                                    {%$Think.lang.order_now_1_1_3%}
+                                    {%$Think.lang.order_now_1_1_1%}<empty name="email_import">{%$Think.lang.admin_email%}<else /><a class="email_import" target="_blank" href="{%$email_import|default='#'%}">{%$Think.lang.order_now_1_1_2%}</a></empty>{%$Think.lang.order_now_1_1_3%}
+
+
                                     <span class="">{%$Think.lang.order_now_1_2%}</span>{%$Think.lang.thank_you%}
                                 </case>
                                 <case value="2">
-                                    {%$Think.lang.order_now_1_1_1%}
-                                    <a class="email_import" target="_blank" href="{%$email_import|default='#'%}">{%$Think.lang.order_now_1_1_2%}</a>
-                                    {%$Think.lang.order_now_1_1_3%}
+                                    {%$Think.lang.order_now_1_1_1%}<empty name="email_import">{%$Think.lang.admin_email%}<else /><a class="email_import" target="_blank" href="{%$email_import|default='#'%}">{%$Think.lang.order_now_1_1_2%}</a></empty>{%$Think.lang.order_now_1_1_3%}
+
+
                                     <br>
                                     <eq name="orderList.region_name" value="中国">
                                         <span class="">{%$Think.lang.email_hybrid_1%}</span>

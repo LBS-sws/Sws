@@ -318,13 +318,12 @@ return array(
     'email_import'=>'Email Login Page',
 
     //11-09
-    'address_01'=>'Thank you for acceptance our household pest control quotation. Our specialist will contact you within 2 working days for the service arrangement
-including service date and address.',
+    'address_01'=>'Thank you for acceptance our household pest control quotation. Our specialist will contact you within 2 working days for the service arrangement including service date and address.',
     'address_01_02'=>'Our specialist will contact you within 2 working days for the service arrangement including service date and address.',
     'address_01_03'=>'Your current location',
     'address_01_04'=>'Choose your location',
     'address_01_05'=>'or',
-    'address_01_06'=>'Please enter the address',
+    'address_01_06'=>'Please enter the service address（if you cannot find it,please click <a id="none_address" href="#">here</a>）',
     'address_01_07'=>'search',
     'address_01_08'=>'Regional index',
     'address_01_09'=>'Please select the address',
@@ -341,6 +340,7 @@ including service date and address.',
     'address_09'=>'I am very sorry that the Household pest control quotation has expired. If you still need the service, please go to our website and use the household real-time quote service again. thank you',
     'address_10'=>'',
     'address_11'=>'Sorry, you cannot select more than one option in the same quotation. Thank you.',
+    'address_12'=>'Thank you for acceptance our household pest control quotation. Our specialist will contact you within 2 working days for the service arrangement including service date.',
 
     'city_auth'=>'Region Selection',
     'all_city_auth'=>'checked all city',
@@ -438,4 +438,16 @@ including service date and address.',
     'on'=>"On",
     'off'=>"Off",
     'apply_lcu'=>"apply user",
+    'from_order'=>"from order",
+    'PC'=>"PC",
+    'weChat'=>"weChat",
+    'storey'=>"Floor",
+    'room_number'=>"Room",
+
+    'in_search'=>"Searching ....",
+    'relevant_none'=>"No relevant address",
+    'number'=>"",
+
+    //2018-11-23
+    'order_view_title'=>"This page only displays the quotation within one month. If you want to view the quotation before one month, please export the required quotation on the \"<a href='javascript:goHome();'>home page</a>\"",
 );
