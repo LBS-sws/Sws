@@ -2,7 +2,6 @@
 // 本类由系统自动生成，仅供测试用途
 namespace Sws\Controller;
 use Sws\Service\EmailService;
-use Sws\Service\KehuService;
 use Sws\Service\OrderService;
 use Sws\Service\PdfService;
 use Sws\Service\PhpWordService;
@@ -11,7 +10,6 @@ use Think\Controller;
 
 class LoginController extends Controller {
     public function index(){
-        //var_dump(session('?user'));die();
         if(session('?user')){
             $this->redirect('/sws/index/index');
         }else{
@@ -38,7 +36,6 @@ class LoginController extends Controller {
                 if($password === $userList["password"]){
                     $user = $userView->where(array("id"=>$userList["id"]))->find();
                     session('user',$user);
-                    //var_dump(session('?user'));die();
                     $this->ajaxReturn(array("status"=>1));
                 }else{
                     $this->ajaxReturn(array("status"=>0,"error"=>"password","content"=>L("error_password")));
@@ -60,7 +57,7 @@ class LoginController extends Controller {
             $areaModel = D("Area");
             $businessModel = D("Business");
             $city_id = I("city_id");
-            $re_city = I("city_id");
+			$re_city = $city_id;
             if(empty($city_id)){
                 $cityViewList = $cityViewModel->where(array("www_fix"=>array('like',"%|$web_prefix|%")))->order('z_index asc')->find();
                 if($cityViewList){
@@ -70,10 +67,9 @@ class LoginController extends Controller {
             $cityList = $cityModel->where(array("id"=>$city_id))->order('z_index asc')->find();
             if($cityList){
                 if(empty($re_city)){
-                    $re_city = -1;
                     $cityList["other_open"] = 0;
                 }
-                $areaList = $areaModel->where(array("city_id"=>$re_city,"id"=>array("neq",0)))->order('z_index asc')->select();
+                $areaList = $areaModel->where(array("city_id"=>I("city_id"),"id"=>array("neq","0")))->order('z_index asc')->select();
                 $businessList = $businessModel->where(array("city_id"=>$city_id))->select();
                 $this->ajaxReturn(array("status"=>1,"areaList"=>$areaList,"businessList"=>$businessList,"otherBool"=>$cityList["other_open"],"prefix"=>$prefix,"unit"=>L($cityList['b_unit'])));
             }else{
@@ -116,7 +112,6 @@ class LoginController extends Controller {
 
     //客戶下訂單
     public function orderSave(){
-        set_time_limit(0);
         $orderModel = D("Order");
         $regionModel = D("Region");
         $data = I("post.");
@@ -206,11 +201,13 @@ class LoginController extends Controller {
         $type = I('type',0);//客戶的選擇
         $sta_id = I('index',0);//訂單id（order_id)
         $token = I('token',0);
-        $webPrefix= getWebPrefix();
         if(empty($type)||empty($sta_id)||empty($token)){
             $this->redirect("/sws/login/order");
             return false;
         }else{
+            $orderStaModel = D("OrderSta");//訂單狀態、價格表
+            $orderHisModel = D("OrderHis");//訂單記錄表
+            $orderBusViewModel = D("OrderBusView");
             $orderStaViewModel = D("OrderStaView");
             $map["id"] = $sta_id;
             $map["s_type"] = 1;//一般業務
@@ -230,8 +227,6 @@ class LoginController extends Controller {
                     $email_title= L("send");
                     $data = array("status"=>"guest_service","id"=>$sta_id);
                     $his_data = array("sta_id"=>$sta_id,"status"=>"ok_order");
-                    $this->assign("id",$sta_id);
-                    $this->assign("token",$token);
                     break;
                 case "b": //客戶要求聯繫
                     $email_title= L("email_40");
@@ -249,12 +244,30 @@ class LoginController extends Controller {
             if($rs){
                 if($rs["kehu_set"] == 0){ //允許客戶修改訂單
                     if(!empty($type)){
-                        if($type != "a" || $webPrefix =="cn"){
-                            $data['kehu_set'] = 1;
-                            $kehuService = new  KehuService();
-                            $kehuService->saveKehu($data,$his_data,$email_title,$rs,$type);
-                            $type = $type=="a"?"d":$type;//域名cn不需要輸入地址
+                        $data['kehu_set'] = 1;
+                        $orderStaModel->create($data);
+                        $orderStaModel->save();//修改訂單狀態
+                        $orderHisModel->create($his_data);
+                        $orderHisModel->add();//記錄操作
+                        //管理員主旨修改（開始)
+                        $businessList = $orderBusViewModel->where(array("order_id"=>$rs["order_id"],"type"=>$rs["s_type"]))->select();
+                        $define = C('DEFINE');
+                        $prefix = getNamePrefixToStr($rs["kehu_lang"]);
+                        $bus_str = "";
+                        foreach ($businessList as $business) {
+                            $bus_str.=$business["name".$prefix]."、";
                         }
+                        $appellation_ns= L($define["appellation_list"][$rs["appellation"]]);
+						if($prefix == "_us"){
+							$admin_title = $email_title." - ".$appellation_ns." ".$rs["order_name"]." - ".$bus_str;
+						}else{
+							$admin_title = $email_title." - ".$rs["order_name"].$appellation_ns." - ".$bus_str;
+						}
+                        //管理員主旨修改（結束)
+                        $email_admin = new EmailService("",$admin_title,"",$rs["s_type"]);
+                        $email_admin->setEmailHtml($rs);
+                        $email_admin->setAdminToEmail($rs["city_id"],$sta_id,$type);
+                        $email_admin->sendMail();//給管理員發郵件
                     }
                 }else{
                     $type=L("address_11");
@@ -262,7 +275,7 @@ class LoginController extends Controller {
             }else{
                 $type=L("address_09");
             }
-            $service = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["SERVER_NAME"].__ROOT__;
+            $service = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["SERVER_NAME"]."/instantquote";
             layout(false);
             $this->assign("type",$type);
             $this->assign("service",$service);
@@ -291,7 +304,6 @@ class LoginController extends Controller {
                 $email_admin->sendMail();//給管理員發郵件
             }
         }
-
         $dir = "Public/sws/pdf";
         $handle = opendir($dir);
         while (($file = readdir($handle)) !== false) {
@@ -304,89 +316,9 @@ class LoginController extends Controller {
         layout(false);
         return false;
     }
-
-    //客戶搜索地址
-    public function ajaxSearch(){
-        if(IS_AJAX){
-            $id = I("id");
-            $token = I("token");
-            $search = I("searchValue");
-            $page = I("page",1);
-            $kehuService = new KehuService();
-            if($kehuService->validate($id,$token)){
-                $html = $kehuService->mapSearch($search,$page);
-                $this->ajaxReturn(array("status"=>1,"html"=>$html));
-            }else{
-                $this->error(L("illegal_request"),"/sws/login/order",5);
-            }
-        }else{
-            $this->error(L("illegal_request"),"/sws/login/order",5);
-        }
-    }
-
-    //客戶選擇區域
-    public function ajaxSelect(){
-        if(IS_AJAX){
-            $id = I("id");
-            $token = I("token");
-            $search = I("searchValue","");
-            $page = I("page",1);
-            $kehuService = new KehuService();
-            if($kehuService->validate($id,$token)){
-                $html = $kehuService->mapSelect($search,$page);
-                $this->ajaxReturn(array("status"=>1,"html"=>$html));
-            }else{
-                $this->error(L("illegal_request"),"/sws/login/order",5);
-            }
-        }else{
-            $this->error(L("illegal_request"),"/sws/login/order",5);
-        }
-    }
-
-    //ip定位
-    public function ajaxIp(){
-        if(IS_AJAX){
-            $id = I("id");
-            $token = I("token");
-            $page = I("page",1);
-            $kehuService = new KehuService();
-            if($kehuService->validate($id,$token)){
-                $html = $kehuService->ipNow($page);
-                $this->ajaxReturn(array("status"=>1,"html"=>$html));
-            }else{
-                $this->error(L("illegal_request"),"/sws/login/order",5);
-            }
-        }else{
-            $this->error(L("illegal_request"),"/sws/login/order",5);
-        }
-    }
-
-    //客戶保存地址
-    public function saveAddress(){
-        if(IS_AJAX){
-            $id = I("id");
-            $token = I("token");
-            $address = I("address");
-            $storey = I("storey","");
-            $room_number = I("room_number","");
-            $kehuService = new KehuService();
-            if($kehuService->validate($id,$token)){
-                $orderModel = D("Order");
-                $orderList = $kehuService->getOrderList();
-                $address.=empty($storey)?"":"  楼层：$storey";
-                $address.=empty($room_number)?"":"  室号：$room_number";
-                $orderModel-> where(array("id"=>$orderList["order_id"]))->setField('address',$address);
-                $email_title= L("send");
-                $data = array("status"=>"guest_service","id"=>$id,'kehu_set'=>1,'kehu_set'=>1);
-                $his_data = array("sta_id"=>$id,"status"=>"ok_order");
-                $kehuService->saveKehu($data,$his_data,$email_title,$orderList);
-                $url = $_SERVER["REQUEST_SCHEME"].'://'.$_SERVER["HTTP_HOST"]."/".C('DEFINE')["close_open_prefix"]."/index.php?lang=".getTopStrToLang();
-                $this->ajaxReturn(array("status"=>1,"html"=>L("address_12"),"url"=>$url));
-            }else{
-                $this->ajaxReturn(array("status"=>0,"html"=>L("save_error"),"url"=>U("/sws/login/order")));
-            }
-        }else{
-            $this->error(L("illegal_request"),"/sws/login/order",5);
-        }
+	
+    public function test(){
+        $bool = sendMail("1948533508@qq.com","test1222","tes11t12");
+        var_dump($bool);
     }
 }

@@ -9,7 +9,7 @@ $(function ($) {
         case "en-us":
             var otherStr = "Others";
             var Indoor_area = "Gross Floor Area：";
-            var Indoor_area_a = "Gross Floor Area/Saleable Area：";
+            var Indoor_area_a = "Saleable Area：";
             break;
         default:
             var otherStr = "其他";

@@ -202,7 +202,7 @@ function getWebPrefix(){
     $webServer = $_SERVER["SERVER_NAME"];
     $prefix = explode(".",$webServer);
     if(count($prefix) <= 2){
-        $prefix = 'cn';
+        $prefix = 'hk';
     }else{
         $prefix = end($prefix);
     }
@@ -312,6 +312,7 @@ function sendMail($to, $title, $content,$code=0,$pdf=false,$pdfTitle="") {
     Vendor('PHPMailer.PHPMailerAutoload');
     $mail = new PHPMailer(); //实例化
     $mail->IsSMTP(); // 启用SMTP
+
     $email_service = $emailConfig["Mail"];
     if(!empty($code)){
         $title.=" - ".$code;
@@ -331,7 +332,7 @@ function sendMail($to, $title, $content,$code=0,$pdf=false,$pdfTitle="") {
 
     $mail->Host=$email_service['MAIL_HOST']; //smtp服务器的名称（这里以QQ邮箱为例）
     $mail->Port = $email_service['MAIL_PORT'];
-    //$mail->SMTPDebug = 1;//啟用調試模式
+    //$mail->SMTPDebug = 2;//啟用調試模式
     $mail->Username = $email_service['MAIL_USERNAME']; //你的邮箱名
     $mail->Password = $email_service['MAIL_PASSWORD']; //邮箱密码
     $mail->From = $email_service['MAIL_FROM']; //发件人地址（也就是你的邮箱地址）
@@ -351,6 +352,7 @@ function sendMail($to, $title, $content,$code=0,$pdf=false,$pdfTitle="") {
 
 //統一計算訂單的總價
 function setOrderTotalPrice(&$orderList){
+    $bool = true;
     if(empty($orderList["kehu_lang"])){
         $orderList["kehu_lang"] = "";
     }
@@ -366,6 +368,9 @@ function setOrderTotalPrice(&$orderList){
     if(empty($orderList["total_price"])){
         $totalPrice = 0;//初始設定為交通費
         if($orderList["calculation"]==1){ //害蟲合併計算
+            if($orderList['web_prefix']=="TW"){ //如果地區是台灣，最低價格包含交通費用
+                $minPrice-=floatval($orderList["area_price"]);
+            }
             foreach ($businessList as $key =>$business){
                 $business_list_name[] =$business["name".$prefix];
                 $orderList["business_id"] .=$business["bus_id"].",";

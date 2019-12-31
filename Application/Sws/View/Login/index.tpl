@@ -7,6 +7,24 @@
     <css href="__PUBLIC__/css/bootstrap.min.css"/>
     <css href="__PUBLIC__/sws/css/login.css?{%$Think.config.DEFINE.webVersions%}"/>
     <js href="__PUBLIC__/js/jquery-3.2.1.min.js"/>
+	<script>
+
+var _hmt = _hmt || [];
+
+(function() {
+
+  var hm = document.createElement("script");
+
+  hm.src = "https://hm.baidu.com/hm.js?ddf8b7b1dcceb762ab5a1ec4c9f230f0";
+
+  var s = document.getElementsByTagName("script")[0];
+
+  s.parentNode.insertBefore(hm, s);
+
+})();
+
+</script>
+
 </head>
 <body>
 <div class="container">

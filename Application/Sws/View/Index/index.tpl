@@ -50,7 +50,7 @@
     </div>
 </form>
 
-<js href="__PUBLIC__/js/Chart.js"/>
+<js href="__PUBLIC__/sws/js/Chart.js?{%$Think.config.DEFINE.webVersions%}"/>
 <js href="__PUBLIC__/js/bootstrap-datetimepicker.min.js"/>
 <js href="__PUBLIC__/js/datetimepicker-lan.js?{%$Think.config.DEFINE.webVersions%}"/>
 <script>
@@ -87,7 +87,7 @@
                 dataType: "json",
                 success: function(fs){
                     fs = fs["info"];
-/*                    var data = {
+                    var data = {
                         title:"{%$thisYear%}{%:L('order_count_year')%}",
                         atrX:"{%:L('order_number')%}",
                         labels : fs["arrMonth"],
@@ -100,39 +100,15 @@
                                 data : fs["arrCount"]
                             }
                         ]
-                    };*/
-                    var data = {
-                        labels: fs["arrMonth"],
-                        datasets: [
-                            {
-                                label: "微信公众号",
-                                fill: false,
-                                borderColor: "rgba(97, 218, 165,.5)",
-                                backgroundColor:"rgba(97, 218, 165,.3)",
-                                data: fs["arrWeChat"]
-                            },
-                            {
-                                label: "电脑",
-                                fill: false,
-                                borderColor: "rgba(120, 165, 241,1)",
-                                backgroundColor:"rgba(120, 165, 241,.4)",
-                                data: fs["arrPC"]
-                            }
-                        ]
                     };
                     var ctx = $("#canvas").get(0).getContext("2d");
-                    var myNewChart = new Chart(ctx,{
-                        type:'line',
-                        data: data
-                    });
-/*                    var options = {
+                    var myNewChart = new Chart(ctx);
+                    var options = {
                         datasetFill : false,
                         animation : false,
                         scaleFontSize : 16,
-                    };*/
-                    //var line = myNewChart.Line(data,options);
-/*                    myLineChart.data.datasets[0].data[2] = 50; // Would update the first dataset's value of 'March' to be 50
-                    myLineChart.update();*/
+                    };
+                    var line = myNewChart.Line(data,options);
                 }
             });
         }).trigger("change");

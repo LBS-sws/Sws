@@ -16,6 +16,24 @@
             }
         </style>
     </eq>
+	<script>
+
+var _hmt = _hmt || [];
+
+(function() {
+
+  var hm = document.createElement("script");
+
+  hm.src = "https://hm.baidu.com/hm.js?ddf8b7b1dcceb762ab5a1ec4c9f230f0";
+
+  var s = document.getElementsByTagName("script")[0];
+
+  s.parentNode.insertBefore(hm, s);
+
+})();
+
+</script>
+
 </head>
 <body>
 <assign name="DEFINE" value="$Think.config.DEFINE" />

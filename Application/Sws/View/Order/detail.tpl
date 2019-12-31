@@ -127,19 +127,15 @@
                     {%$orderList.lcd%}
                 </div>
                 <label class="control-label col-lg-1">{%$Think.lang.apply_lcu%}：</label>
-                <div class="col-lg-1 form-control-static">
+                <div class="col-lg-2 form-control-static">
                     <eq name="orderList.lcu" value="客戶">
                         {%$Think.lang.client%}
                         <else/>
                         {%$orderList.lcu%}
                     </eq>
                 </div>
-                <label class="control-label col-lg-1">{%$Think.lang.from_order%}：</label>
-                <div class="col-lg-1 form-control-static">
-                    {%$orderList.from_order%}
-                </div>
                 <label class="control-label col-lg-1">{%$Think.lang.order_status%}：</label>
-                <div class="col-lg-1 form-control-static text-{%$orderList.style%}">
+                <div class="col-lg-2 form-control-static text-{%$orderList.style%}">
                     {%$orderList.status|L%}
                 </div>
             </div>
