@@ -193,4 +193,23 @@ class OrderController extends BaseController {
             $this->redirect("sws/api/orderList",array(),6,"666666666");
         }
     }
+
+    //退回订单
+	public function ajaxLoad(){
+        if (IS_AJAX) {
+            $data = I("get.");
+            $orderService = new OrderService();
+            $orderList = $orderService->getOrderAllListToCity($data);
+            $ajaxData = array(
+                'draw'=>$data['draw'],
+                'recordsTotal'=>count($orderList),
+                'recordsFiltered'=>count($orderList),
+                'data'=>$orderList,
+            );
+            $this->ajaxReturn($ajaxData);
+            //var_dump($data);die();
+        }else{
+            $this->redirect("sws/api/orderList",array(),6,"666666666");
+        }
+    }
 }

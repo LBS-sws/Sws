@@ -105,14 +105,14 @@
                         labels: fs["arrMonth"],
                         datasets: [
                             {
-                                label: "微信公众号",
+                                label: "{%$Think.lang.weChat%}",
                                 fill: false,
                                 borderColor: "rgba(97, 218, 165,.5)",
                                 backgroundColor:"rgba(97, 218, 165,.3)",
                                 data: fs["arrWeChat"]
                             },
                             {
-                                label: "电脑",
+                                label: "{%$Think.lang.PC%}",
                                 fill: false,
                                 borderColor: "rgba(120, 165, 241,1)",
                                 backgroundColor:"rgba(120, 165, 241,.4)",

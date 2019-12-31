@@ -34,6 +34,7 @@ class BaseController extends Controller{
         $userView = D("UserView");
         $userSession = session("user");
         $user = $userView->where(array("id"=>$userSession["id"]))->find();
+        unset($user["password"]);
         session('user',$user);
     }
 
