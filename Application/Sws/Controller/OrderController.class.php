@@ -8,9 +8,9 @@ use Sws\Service\PdfService;
 class OrderController extends BaseController {
 
     public function index(){
-        $orderService = new OrderService();
+/*        $orderService = new OrderService();
         $orderList = $orderService->getOrderAllListToCityAJAX();
-        $this->assign("orderList",$orderList);
+        $this->assign("orderList",$orderList);*/
         $this->assign("prefix",getNamePrefix());
         $this->display("./Order/index_ajax");
 	}

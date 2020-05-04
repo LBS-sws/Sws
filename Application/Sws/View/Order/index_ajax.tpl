@@ -8,8 +8,8 @@
                 <th width="9%" data-data="order_name">{%$Think.lang.order_name%}</th>
                 <th width="6%" data-data="appellation_ns" class="hidden-xs">{%$Think.lang.appellation%}</th>
                 <th width="9%" data-data="phone" class="hidden-xs">{%$Think.lang.phone%}</th>
-                <th width="7%" data-data="city_name">{%$Think.lang.city_name%}</th>
-                <th width="7%" data-data="area_name" class="hidden-xs">{%$Think.lang.area_name%}</th>
+                <th width="7%" data-data="city_name{%$prefix%}">{%$Think.lang.city_name%}</th>
+                <th width="7%" data-data="area_name{%$prefix%}" class="hidden-xs">{%$Think.lang.area_name%}</th>
                 <th width="16%" data-data="business_name" data-orderable="false" class="hidden-xs">{%$Think.lang.Infestation%}</th>
                 <th width="10%" data-data="lcd">{%$Think.lang.order_time%}</th>
                 <th width="7%" data-data="from_order">{%$Think.lang.from_order%}</th>
@@ -18,25 +18,6 @@
             </tr>
             </thead>
             <tbody>
-            <volist name="orderList" id="list">
-                <tr class="{%$list.style%}">
-                    <td>{%$list.s_code%}</td>
-                    <td>{%$list.order_name%}</td>
-                    <td class="hidden-xs">{%$list.appellation_ns%}</td>
-                    <td class="hidden-xs">{%$list.phone%}</td>
-                    <td>{%$list["city_name$prefix"]%}</td>
-                    <td class="hidden-xs">{%$list["area_name$prefix"]%}</td>
-                    <td class="hidden-xs">{%$list.business_name%}</td>
-                    <td>{%$list.lcd%}</td>
-                    <td>{%$list.from_order%}</td>
-                    <td>{%$list.status%}</td>
-                    <td class="text-center">
-                        <a href="{%:U('/sws/order/detail',array('index'=>$list['id']))%}">
-                            {%$Think.lang.detail%}
-                        </a>
-                    </td>
-                </tr>
-            </volist>
             </tbody>
         </table>
     </div>
@@ -60,6 +41,7 @@
             "processing": true,
             "serverSide": true,
             "ajax" : "{%:U('/sws/order/ajaxLoad')%}",
+            "order": [[7, "desc" ]],
             "columnDefs": [
                 {
                     "targets": [targets],
@@ -78,6 +60,7 @@
                 $('td',row).eq(6).addClass("hidden-xs");
                 $('td',row).eq(7).addClass("hidden-xs");
                 $('td',row).eq(10).addClass("text-center");
+                $(row).addClass(data["style"]);
             },
         };
         $("#example").dataTable(pos);
