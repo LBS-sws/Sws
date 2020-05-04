@@ -9,10 +9,10 @@ class OrderController extends BaseController {
 
     public function index(){
         $orderService = new OrderService();
-        $orderList = $orderService->getOrderAllListToCity();
+        $orderList = $orderService->getOrderAllListToCityAJAX();
         $this->assign("orderList",$orderList);
         $this->assign("prefix",getNamePrefix());
-        $this->display();
+        $this->display("./Order/index_ajax");
 	}
 
     public function edit($index){
@@ -194,12 +194,12 @@ class OrderController extends BaseController {
         }
     }
 
-    //退回订单
+    //訂單列表（異步請求列表）
 	public function ajaxLoad(){
         if (IS_AJAX) {
             $data = I("get.");
             $orderService = new OrderService();
-            $orderList = $orderService->getOrderAllListToCity($data);
+            $orderList = $orderService->getOrderAllListToCityAJAX($data);
             $ajaxData = array(
                 'draw'=>$data['draw'],
                 'recordsTotal'=>count($orderList),

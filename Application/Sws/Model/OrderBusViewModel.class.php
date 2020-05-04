@@ -23,6 +23,7 @@ class OrderBusViewModel extends Model\ViewModel {
             'name_tw'=>'name_tw',
             'type'=>'type',
             'price'=>'price',
+            'city_id'=>'city_id',
             '_on'=>'OrderBus.bus_id=Business.id'
         )
     );
