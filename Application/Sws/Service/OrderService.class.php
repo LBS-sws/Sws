@@ -345,6 +345,141 @@ class OrderService{
         );
     }
 
+    //異步訂單列表的查詢語句
+    private function orderSearchAjaxToSql(&$where,$search){
+        $bool = true;//需要後續查詢
+        $user = session("user");
+        $prefix = getNamePrefix();
+        $define = C('DEFINE');
+        $appellationList = $define["appellation_list"];
+        $orderBusViewModel = D("OrderBusView");
+        $stringMap = '';
+        foreach ($appellationList as $key =>$appellation){//稱謂查詢
+            if($search == L($appellation)){
+                $where["appellation"] = array('eq', $key);
+                $bool = false;
+                continue;
+            }
+        }
+        if($bool){
+            //害蟲查詢
+            $map["city_id"]= array('in',$user["city_auth"]);
+            $map["name$prefix"]= array('like',"%$search%");
+            $businessList = $orderBusViewModel->where($map)->group("order_id,type")->getField('order_id,type',true);
+            if(!empty($businessList)){
+                foreach ($businessList as $order_id =>$type){
+                    $stringMap.=empty($stringMap)?"":" or ";
+                    $stringMap.=" (order_id = '$order_id' and s_type = '$type') ";
+                }
+                $where['_string'] = $stringMap;
+                $bool = false;
+            }
+        }
+        if($bool){
+            //報價狀態查詢
+            if(strpos(L("order_status_sales"),$search)!==false){
+                $where['_string'] = "s_type = 0 and status = 'send'";
+                $bool = false;
+            }elseif (strpos(L("send_new"),$search)!==false){
+                $where['_string'] = "s_type = 1 and status = 'send'";
+                $bool = false;
+            }
+            $statusList = D("OrderSta")->where(array("status"=>array("neq","send")))->group("status")->getField('status',true);
+            $arrIn=array();
+            foreach ($statusList as $status){
+                if(strpos(L($status),$search)!==false){
+                    $arrIn[] = $status;
+                }
+            }
+            if(!empty($arrIn)){
+                $where['status'] = array('in',$arrIn);
+                $bool = false;
+            }
+        }
+        if($bool){
+            //下單時間查詢
+            if(is_numeric($search)){
+                $where['_string'] = "(date_format(OrderSta.lcd,'%Y') like '%$search%') or (date_format(OrderSta.lcd,'%m') like '%$search%') or (date_format(OrderSta.lcd,'%d') like '%$search%')";
+            }elseif (strpos($search,'-')!==false){
+                $arr = explode("-",$search);
+                foreach ($arr as $key =>$item){
+                    if (!is_numeric($item)&&!empty($item)){
+                        return $bool;
+                    }
+                }
+                switch (count($arr)){
+                    case 2:
+                        $where['_string'] = "date_format(OrderSta.lcd,'%Y-%m') like '%$search%'";
+                        break;
+                    case 3:
+                        $where['_string'] = "date_format(OrderSta.lcd,'%Y-%m-%d') like '%$search%'";
+                        break;
+                }
+            }
+        }
+        return $bool;
+    }
+
+    //獲取所有的訂單列表(有權限）- ajax(異步分頁)
+    public function getOrderAllListToCityAJAX($data=array()){
+        $orderSql = "id desc";
+        $define = C('DEFINE');
+        $user = session("user");
+        $prefix = getNamePrefix();
+        $orderStaViewModel = D("OrderStaView");
+        $orderBusViewModel = D("OrderBusView");
+        $map["city_id"]= array('in',$user["city_auth"]);
+        if(key_exists("search",$data)){ //查詢處理
+            $search = $data["search"]["value"];
+            if(!empty($search)){
+                $itemList = array('s_code','order_name','phone',"city_name$prefix","area_name$prefix");
+                $where = array();
+                $bool = $this->orderSearchAjaxToSql($where,$search);
+                if($bool){
+                    foreach ($itemList as $item){
+                        $where[$item]  = array('like', "%$search%");
+                    }
+                }
+                $where['_logic'] = 'or';
+                $map['_complex'] = $where;
+            }
+        }
+        if(key_exists("order",$data)){//排序處理
+            $order = current($data["order"]);//appellation_ns
+            $orderSql = $data["columns"][$order["column"]]["data"];
+            $orderSql = $orderSql=="appellation_ns"?"appellation":$orderSql;
+            $orderSql.=" ".$order["dir"].",s_type desc";
+        }
+        $start = key_exists("start",$data)?$data["start"]:10;
+        $length = key_exists("length",$data)?$data["length"]:10;
+        $total = $orderStaViewModel->where(array("city_id"=> array('in',$user["city_auth"])))->count();
+        $filtered = $orderStaViewModel->where($map)->count();
+        $orderList = $orderStaViewModel->where($map)->order($orderSql)->limit($start,$length)->select();
+        //var_dump($orderStaViewModel->getLastSql());
+        if(!empty($orderList)){
+            foreach ($orderList as &$order){
+                $order["from_order"] = empty($order["from_order"])?L("PC"):L("weChat");
+                $order["appellation_ns"] = L($define["appellation_list"][$order["appellation"]]);
+                $businessList = $orderBusViewModel->where(array("order_id"=>$order["order_id"],"type"=>$order["s_type"]))->getField('name'.$prefix,true);
+                $order["business_name"] = implode("、",$businessList);
+                $order["style"] = getStyleToStatus($order["status"]);
+                $order["lcd"] = date("Y-m-d",strtotime($order["lcd"]));
+                if($order["s_type"]==0 && $order["status"]=="send"){
+                    $order["status"] = "order_status_sales";
+                }elseif ($order["s_type"]==1 && $order["status"]=="send"){
+                    $order["status"] = "send_new";
+                }
+                $order["status"] = L($order["status"]);
+            }
+        }else{
+            $orderList = array();
+        }
+        return array(
+            "orderList"=>$orderList,
+            "filtered"=>$filtered,
+            "total"=>$total
+        );
+    }
     //獲取所有的訂單列表(有權限）
     public function getOrderAllListToCity(){
         $define = C('DEFINE');
